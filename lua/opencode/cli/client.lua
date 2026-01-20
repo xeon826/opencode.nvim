@@ -149,6 +149,13 @@ function M.tui_append_prompt(text, port, callback)
   M.call(port, "/tui/publish", "POST", { type = "tui.prompt.append", properties = { text = text } }, callback)
 end
 
+---@param parts table[] Array of { type: "file"|"agent", path?: string, name?: string }
+---@param port number
+---@param callback fun(response: table)|nil
+function M.tui_append_parts(parts, port, callback)
+  M.call(port, "/tui/publish", "POST", { type = "tui.prompt.appendParts", properties = { parts = parts } }, callback)
+end
+
 ---@param command opencode.Command|string
 ---@param port number
 ---@param callback fun(response: table)|nil

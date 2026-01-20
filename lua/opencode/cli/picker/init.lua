@@ -53,34 +53,33 @@ function M._send_cb(opts)
   opts = opts or {}
   ---@param items opencode.picker.Loc[]
   return function(items)
-    local Context = require("opencode.context")
-    local lines = {} ---@type string[]
-    for _, item in ipairs(items) do
-      local path = item.path
-      if item.cwd and item.cwd ~= vim.loop.cwd() then
-        path = item.cwd .. "/" .. path
-      end
-      local location = Context.format({
-        path = path,
-        start_line = item.row,
-        start_col = item.col,
-        end_line = item.end_row,
-        end_col = item.end_col,
-      })
-      if location ~= "" then
-        table.insert(lines, location)
-      end
+    if #items == 0 then
+      return
     end
-    if #lines > 0 then
-      vim.schedule(function()
-        local prompt = (opts.prompt or "") .. " " .. table.concat(lines, " ")
-        require("opencode").prompt(prompt, opts)
+    vim.schedule(function()
+      require("opencode.cli.server").get_port():next(function(port)
+        local parts = {} ---@type table[]
+        for _, item in ipairs(items) do
+          local path = item.path
+          if item.cwd and item.cwd ~= vim.loop.cwd() then
+            path = item.cwd .. "/" .. path
+          end
+          table.insert(parts, {
+            type = "file",
+            path = vim.fn.fnamemodify(path, ":.")
+          })
+        end
+        require("opencode.cli.client").tui_append_parts(parts, port, function()
+          if opts.prompt then
+            require("opencode.cli.client").tui_append_prompt(opts.prompt, port)
+          end
+        end)
       end)
-    end
+    end)
   end
-end
+  end
 
----@param source string
+  ---@param source string
 ---@param opts? { prompt?: string, submit?: boolean }
 ---@param popts? table
 function M.open(source, opts, popts)
