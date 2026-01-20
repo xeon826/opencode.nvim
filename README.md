@@ -71,6 +71,45 @@ programs.nixvim = {
 > [!TIP]
 > Run `:checkhealth opencode` after setup.
 
+## 🔗 Snacks.nvim Picker Integration
+
+If you're using [snacks.nvim](https://github.com/folke/snacks.nvim), you can send picker selections directly to opencode. This is useful for sending search results, grep matches, or file selections as context.
+
+Example snacks picker configuration:
+
+```lua
+{
+  "folke/snacks.nvim",
+  optional = true,
+  opts = {
+    picker = {
+      actions = {
+        opencode_send = function(...)
+          return require("opencode.cli.picker.snacks").send(...)
+        end,
+      },
+      win = {
+        input = {
+          keys = {
+            ["<C-o>"] = {
+              "opencode_send",
+              mode = { "n", "i" },
+            },
+          },
+        },
+      },
+    },
+  },
+}
+```
+
+With this configuration, pressing `<C-o>` in any Snacks picker will send the selected items to opencode. The integration automatically handles:
+
+- File selections with full paths
+- Grep results with line numbers and positions
+- Multiple selections (sends all selected items)
+- Position ranges for precise context
+
 ## ⚙️ Configuration
 
 `opencode.nvim` provides a rich and reliable default experience — see all available options and their defaults [here](./lua/opencode/config.lua).

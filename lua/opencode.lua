@@ -14,4 +14,6 @@ M.stop = require("opencode.provider").stop
 
 M.statusline = require("opencode.status").statusline
 
+M.picker = require("opencode.cli.picker")
+
 return M
